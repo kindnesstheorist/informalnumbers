@@ -4,10 +4,12 @@
 # integer numbers will always be formal. Numbers with an absolute value of one
 # million or higher will be converted to strings with Python's built-in
 # function. Non-number input will cause a crash.
+#
+# Decimal functionality not tested with non-US locales.
 def word(number, formality=True):
-    letters = str(number)
-    parts = letters.split(".")
-    if len(parts) > 1:
+    if number != int(number):
+        letters = str(number)
+        parts = letters.split(".")
         constructed = word(int(parts[0])) + " point"
         for letter in parts[1]:
             constructed = constructed + " " + word(int(letter))
@@ -65,46 +67,49 @@ def word(number, formality=True):
     if number == 90:
         return "ninety"
     if number < 100:
-        return word(int(number/10)*10) + "-" + word(number%10)
+        return word(truncate(number, 10)) + "-" + word(number%10)
     if number == 100:
         if formality:
             return "one hundred"
         else:
             return "a hundred"
     if number < 1000:
-        if number == int(number/100)*100:
-            return word((int(number/100))) + " hundred"
+        if exact(number, 100):
+            return word(int(number/100)) + " hundred"
         if formality:
             separator = " hundred "
         else:
             separator = " hundred and "
-        return word(int(number/100)) + separator + word(number%100, formality)
+        return word(int(number/100)) + separator + word(number%100)
     if number == 1000:
         if formality:
             return "one thousand"
         else:
             return "a thousand"
-    if number < 1021:
+    if number < 1020:
         if formality:
             separator = " "
         else:
             separator = " and "
         return word(1000, formality) + separator + word(number%1000)
     if number < 2000:
-        complexity = 0
-        for letter in letters:
-            if letter != "0":
-                complexity += 1
-        if complexity < 3 and not formality:
-            if letters[1] == "0":
-                return word(int(number/1000)*1000, formality) + " and " + word(number%1000)
-            return word(int(number/100)) + " hundred"
+        if not formality and exact(number, 100):
+            return word((int(number/100))) + " hundred"
     if number == 100000:
         if not formality:
             return "a hundred thousand"
     if number < 1000000:
-        if number == int(number/1000)*1000:
+        if exact(number, 1000):
             return word((int(number/1000))) + " thousand"
-        else:
-            return word(int(number/1000)) + " thousand " + word(number%1000)
+        if not formality:
+            if number < 10000 and number%1000 < 100 and exact(number, 10):
+                return word(truncate(number, 1000), formality) + " and " + word(number%1000)
+        return word(int(number/1000)) + " thousand " + word(number%1000)
     return str(number)
+
+def truncate(number, precision):
+    return number-number%precision
+
+def exact(number, precision):
+    return number == truncate(number, precision)
+
