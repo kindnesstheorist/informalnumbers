@@ -1,5 +1,5 @@
 # If formality is False, the function will attempt to construct an informal
-# phrase for the number. Formality affects only numbers from 100 to 2000, with
+# phrase for the number. Formality affects only numbers from 100 to 10000, with
 # the exception of 100,000, which has an informal variant. Negative and non-
 # integer numbers will always be formal. Numbers with an absolute value of one
 # million or higher will be converted to strings with Python's built-in
